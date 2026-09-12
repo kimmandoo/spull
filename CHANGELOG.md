@@ -4,6 +4,8 @@
 - ci(release): built a universal unsigned macOS bundle on an Apple Silicon
   runner and published a quarantine-clearing launcher for Intel and Apple
   Silicon Macs.
+- fix(release): made the macOS launcher locate case-insensitive app paths
+  throughout the extracted release folder and report the expected layout.
 
 ## 2026-09-06
 - feat(download): added persisted audio bitrate and video resolution

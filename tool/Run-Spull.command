@@ -2,10 +2,12 @@
 set -euo pipefail
 
 script_directory="$(cd -- "$(dirname -- "$0")" && pwd)"
-app_path="$script_directory/spull.app"
+app_path="$(/usr/bin/find "$script_directory" -type d -iname 'spull.app' -print -quit)"
 
-if [[ ! -d "$app_path" ]]; then
+if [[ -z "$app_path" || ! -d "$app_path" ]]; then
   print -u2 "Spull.app was not found beside this launcher."
+  print -u2 "Extract the complete ZIP and keep Run-Spull.command with spull.app."
+  print -u2 "Launcher folder: $script_directory"
   exit 1
 fi
 

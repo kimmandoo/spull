@@ -135,8 +135,9 @@ The release workflow builds one universal unsigned app bundle:
 
 The bundle intentionally sets `CODE_SIGNING_ALLOWED = NO`; it does not
 require an Apple Developer account, provisioning profile, or notarization.
-Extract the archive, then double-click `Run-Spull.command`. The launcher
-removes the download quarantine attribute from only the adjacent `spull.app`
+Extract the complete archive without separating the launcher from the app,
+then double-click `Run-Spull.command`. The launcher searches the extracted
+release folder for `spull.app`, removes its download quarantine attribute,
 and opens it. If Terminal blocks the launcher, run this trusted-release
 fallback from the extracted folder:
 
