@@ -6,6 +6,10 @@
   Silicon Macs.
 - fix(release): made the macOS launcher locate case-insensitive app paths
   throughout the extracted release folder and report the expected layout.
+- ci(release): allowed manual workflow runs to package and upload Linux, macOS,
+  and Windows artifacts for a full cross-platform recheck.
+- docs(readme): documented manual CI reruns, package artifacts, and the
+  unsigned macOS launch fallback.
 
 ## 2026-09-06
 - feat(download): added persisted audio bitrate and video resolution

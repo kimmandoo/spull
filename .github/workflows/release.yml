@@ -143,7 +143,7 @@ jobs:
             exit 1
           fi
       - name: Package release bundle
-        if: github.event_name == 'push' && matrix.target != 'windows'
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && matrix.target != 'windows'
         shell: bash
         env:
           ARTIFACT_PATH: ${{ matrix.bundle_path }}
@@ -169,18 +169,18 @@ jobs:
               ;;
           esac
       - name: Package Windows release bundles
-        if: github.event_name == 'push' && matrix.target == 'windows'
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && matrix.target == 'windows'
         shell: pwsh
         run: .\tool\package_windows_release.ps1 -ReleaseDirectory '${{ matrix.bundle_path }}' -OutputDirectory release-assets
       - name: Upload release package
-        if: github.event_name == 'push' && matrix.target != 'windows'
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && matrix.target != 'windows'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: release-${{ matrix.artifact_name }}
           path: release-assets/${{ matrix.asset_name }}
           if-no-files-found: error
       - name: Upload Windows release packages
-        if: github.event_name == 'push' && matrix.target == 'windows'
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && matrix.target == 'windows'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: release-${{ matrix.artifact_name }}

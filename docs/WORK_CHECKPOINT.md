@@ -1,22 +1,23 @@
 # Work checkpoint
 
-- Active task: Completed the v1.2.7 macOS launcher fix and release.
-- Next action: No follow-up action; wait for the next requested task.
-- Changed files: `tool/Run-Spull.command`, `README.md`, `CHANGELOG.md`,
-  `pubspec.yaml`, and this checkpoint.
-- Runtime behavior: The launcher searches its extracted release folder
-  case-insensitively for `spull.app`, so folder-name casing and one extra
-  extraction directory do not prevent startup. It still removes only the
-  app's `com.apple.quarantine` attribute.
-- Release state: `release-v1.2.7` points to `b7ddd46` and is pushed with
-  `main` to `origin`; GitHub Actions run `34686226889` completed successfully
-  and published the four desktop assets.
+- Active task: Recheck Linux, macOS, and Windows CI packaging and refresh the
+  release documentation.
+- Next action: Commit and push the changes, trigger `workflow_dispatch` on
+  `main`, and verify all three platform jobs.
+- Changed files: `.github/workflows/release.yml`, `README.md`,
+  `CHANGELOG.md`, and this checkpoint.
+- CI behavior: Manual workflow runs now execute the same package steps as
+  release-tag runs and upload Linux, universal macOS, and Windows packages
+  without creating a GitHub Release.
+- Documentation behavior: README explains the manual CI path, package
+  artifact names, and robust unsigned macOS launcher fallback.
+- Release state: `release-v1.2.7` remains the latest published release;
+  this verification change is pending commit and manual CI execution.
 - Verification:
-  - Published v1.2.6 archive layout confirmed the launcher and app were
-    packaged together.
-  - Patched launcher syntax passed `zsh -n`.
-  - Patched launcher found and launched the quarantined extracted app.
+  - Workflow YAML parsed and launcher syntax passed `zsh -n`.
+  - `git diff --check` passed.
   - `dart run tool/verify.dart` passed formatting, analysis, and all widget
     tests.
-  - Release CI passed Linux, macOS, Windows, packaging, and publication.
+  - Local `flutter build macos --release` and macOS runtime verification
+    passed.
 - Blockers: None.

@@ -142,12 +142,34 @@ and opens it. If Terminal blocks the launcher, run this trusted-release
 fallback from the extracted folder:
 
 ```bash
-xattr -dr com.apple.quarantine spull.app
-open spull.app
+APP="$(find . -type d -iname 'spull.app' -print -quit)"
+test -n "$APP"
+xattr -dr com.apple.quarantine "$APP"
+open "$APP"
 ```
 
 Unsigned local distribution is not suitable for the Mac App Store. Only
 remove quarantine from a release you trust.
+
+## CI verification
+
+The pinned Flutter workflow verifies formatting, analysis, and widget tests,
+then builds the complete desktop runtime on Linux, macOS, and Windows. The
+macOS job checks the Apple Silicon runner, universal `arm64`/`x86_64`
+executable slices, unsigned output, and the quarantine-clearing launcher
+package.
+
+To re-run the full build without creating a release:
+
+1. Open **Actions → Flutter desktop CI**.
+2. Click **Run workflow** and select the `main` branch.
+3. Inspect the package artifacts after all three build jobs pass:
+   `release-spull-linux-x86_64`, `release-spull-macos-universal`, and
+   `release-spull-windows-x86_64`.
+
+The manual run does not create a GitHub Release. A `release-*` tag runs the
+same verification, build, and packaging jobs before publishing the four
+desktop assets.
 
 ## Publishing a release
 
@@ -170,7 +192,7 @@ The script intentionally performs a targeted push equivalent to:
 git push origin main release-v1.2.4
 ```
 
-Do **not** use `git push origin main --tags`; that retries every local tag, including tags already present on the remote. GitHub Actions builds Linux, macOS, and Windows only for `release-*` tags. `workflow_dispatch` remains available for manual verification without publishing a release.
+Do **not** use `git push origin main --tags`; that retries every local tag, including tags already present on the remote. A `release-*` tag runs verification, builds Linux, macOS, and Windows, and publishes the release. `workflow_dispatch` runs the same build and packaging checks without publishing a release.
 
 ## Project map
 
