@@ -21,8 +21,9 @@ jobs:
         include:
           - os: ubuntu-latest
             target: linux
-          - os: macos-latest
+          - os: macos-14
             target: macos
+            macos_arch: arm64
           - os: windows-latest
             target: windows
     steps:
@@ -47,6 +48,14 @@ jobs:
           sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libsecret-1-dev
       - name: Enable desktop target
         run: flutter config --enable-${{ matrix.target }}-desktop
+      - name: Check macOS runner architecture
+        if: matrix.target == 'macos'
+        shell: bash
+        env:
+          EXPECTED_ARCH: ${{ matrix.macos_arch }}
+        run: |
+          test "$(uname -m)" = "$EXPECTED_ARCH"
+          echo "Building macOS $EXPECTED_ARCH on $(sw_vers -productVersion)."
       - name: Check toolchain
         run: |
           flutter --version
@@ -70,11 +79,12 @@ jobs:
             bundle_path: build/linux/x64/release/bundle
             artifact_name: spull-linux-x86_64
             asset_name: spull-linux-x86_64.tar.gz
-          - os: macos-latest
+          - os: macos-14
             target: macos
+            macos_arch: arm64
             bundle_path: build/macos/Build/Products/Release/spull.app
-            artifact_name: spull-macos-aarch64
-            asset_name: spull-macos-aarch64.app.zip
+            artifact_name: spull-macos-universal
+            asset_name: spull-macos-universal.app.zip
           - os: windows-latest
             target: windows
             bundle_path: build/windows/x64/runner/Release
@@ -103,6 +113,35 @@ jobs:
         run: flutter clean && flutter build ${{ matrix.target }} --release
       - name: Verify complete release bundle
         run: dart run tool/verify_desktop_artifact.dart ${{ matrix.target }}
+      - name: Check macOS runner architecture
+        if: matrix.target == 'macos'
+        shell: bash
+        env:
+          EXPECTED_ARCH: ${{ matrix.macos_arch }}
+        run: |
+          test "$(uname -m)" = "$EXPECTED_ARCH"
+          echo "Building macOS $EXPECTED_ARCH on $(sw_vers -productVersion)."
+      - name: Verify macOS architecture and unsigned bundle
+        if: matrix.target == 'macos'
+        shell: bash
+        env:
+          BUNDLE_PATH: ${{ matrix.bundle_path }}
+        run: |
+          executable="$BUNDLE_PATH/Contents/MacOS/spull"
+          archs="$(lipo -archs "$executable")"
+          case " $archs " in
+            *" arm64 "*) ;;
+            *) echo "The macOS bundle is missing arm64."; exit 1 ;;
+          esac
+          case " $archs " in
+            *" x86_64 "*) ;;
+            *) echo "The macOS bundle is missing x86_64."; exit 1 ;;
+          esac
+          test ! -d "$BUNDLE_PATH/Contents/_CodeSignature"
+          if codesign --verify --deep --strict "$BUNDLE_PATH" >/dev/null 2>&1; then
+            echo "The macOS bundle is signed; expected an unsigned release."
+            exit 1
+          fi
       - name: Package release bundle
         if: github.event_name == 'push' && matrix.target != 'windows'
         shell: bash
@@ -114,7 +153,16 @@ jobs:
           mkdir -p release-assets
           case "$TARGET" in
             macos)
-              ditto -c -k --sequesterRsrc --keepParent "$ARTIFACT_PATH" "release-assets/$ASSET_NAME"
+              staging_directory="$(mktemp -d)"
+              package_name="${ASSET_NAME%.app.zip}"
+              package_directory="$staging_directory/$package_name"
+              mkdir -p "$package_directory"
+              ditto "$ARTIFACT_PATH" "$package_directory/spull.app"
+              cp tool/Run-Spull.command "$package_directory/Run-Spull.command"
+              chmod +x "$package_directory/Run-Spull.command"
+              ditto -c -k --sequesterRsrc --keepParent \
+                "$package_directory" "release-assets/$ASSET_NAME"
+              rm -rf "$staging_directory"
               ;;
             linux)
               tar -czf "release-assets/$ASSET_NAME" -C "$ARTIFACT_PATH" .
@@ -169,6 +217,8 @@ jobs:
         run: |
           assets=(release-assets/*)
           test "${#assets[@]}" -eq 4
+          test -f release-assets/spull-linux-x86_64.tar.gz
+          test -f release-assets/spull-macos-universal.app.zip
           test -f release-assets/spull-windows-x86_64.zip
           test -f release-assets/spull-windows-x86_64-setup.zip
       - name: Publish GitHub release

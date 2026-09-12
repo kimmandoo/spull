@@ -128,7 +128,25 @@ The Linux artifact is a `.tar.gz` containing the complete Flutter bundle at its 
 
 ### macOS
 
-The macOS release uses ad-hoc signing (`CODE_SIGN_IDENTITY = -`) without provisioning profiles. It is suitable for local distribution, but it is not notarized and is not a Mac App Store submission. See [`macos/ExportOptions.plist`](macos/ExportOptions.plist).
+The release workflow builds one universal unsigned app bundle:
+
+- `spull-macos-universal.app.zip` — Apple Silicon (`arm64`) and Intel
+  (`x86_64`).
+
+The bundle intentionally sets `CODE_SIGNING_ALLOWED = NO`; it does not
+require an Apple Developer account, provisioning profile, or notarization.
+Extract the archive, then double-click `Run-Spull.command`. The launcher
+removes the download quarantine attribute from only the adjacent `spull.app`
+and opens it. If Terminal blocks the launcher, run this trusted-release
+fallback from the extracted folder:
+
+```bash
+xattr -dr com.apple.quarantine spull.app
+open spull.app
+```
+
+Unsigned local distribution is not suitable for the Mac App Store. Only
+remove quarantine from a release you trust.
 
 ## Publishing a release
 
@@ -167,6 +185,7 @@ tool/
 ├── publish_release.ps1            Guarded branch/tag release publisher
 ├── package_windows_release.ps1   Portable and setup archive packaging
 ├── Install-Spull.ps1              Windows setup wizard
+├── Run-Spull.command             macOS unsigned-bundle launcher
 └── Uninstall-Spull.ps1            Windows removal script
 ```
 

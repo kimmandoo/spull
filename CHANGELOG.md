@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-12
+- ci(release): built a universal unsigned macOS bundle on an Apple Silicon
+  runner and published a quarantine-clearing launcher for Intel and Apple
+  Silicon Macs.
+
 ## 2026-09-06
 - feat(download): added persisted audio bitrate and video resolution
   controls with safe yt-dlp fallbacks.

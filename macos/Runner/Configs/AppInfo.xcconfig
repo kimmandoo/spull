@@ -11,7 +11,8 @@ PRODUCT_NAME = Spull
 PRODUCT_BUNDLE_IDENTIFIER = com.spull.desktop
 PRODUCT_COPYRIGHT = Copyright © 2026 Spull contributors. All rights reserved.
 
-// Ad-hoc builds intentionally use Apple's "-" identity.
+// Debug/profile builds use an ad-hoc identity; Release.xcconfig disables
+// signing for unsigned local-distribution bundles.
 CODE_SIGN_IDENTITY = -
 CODE_SIGN_STYLE = Manual
 DEVELOPMENT_TEAM =
