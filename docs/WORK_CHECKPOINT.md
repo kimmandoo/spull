@@ -1,22 +1,19 @@
 # Work checkpoint
 
-- Active task: Fixed malformed UTF-8 failures while analyzing native yt-dlp output and corrected the advanced-settings ripple clipping.
-- Next action: No follow-up action; wait for the next requested task.
-- Changed files: `lib/services/spull_backend.dart`, `lib/home_page.dart`,
-  `test/widget_test.dart`, `CHANGELOG.md`, and this checkpoint.
-- UTF-8 behavior: Native yt-dlp stdout and stderr now use one shared
-  `Utf8Decoder(allowMalformed: true)` for analysis and download streams, so an
-  isolated non-UTF-8 byte is replaced instead of throwing `FormatException`.
-  The replacement remains valid JSON and preserves the playlist response.
-- UI behavior: The advanced-settings `ExpansionTile` is wrapped in a rounded,
-  clipped `Material`, keeping its ink ripple inside the card boundary.
-- Verification:
-  - `dart run tool/verify.dart` passed formatting, analysis, and all 10 widget
-    tests, including malformed-output decoding and advanced-settings expansion.
-  - `flutter build windows --release` passed and produced the Windows bundle.
-  - The reported URL was exercised through `SpullBackend.analyzeUrl`; it
-    completed without an invalid UTF-8 exception and returned one playable
-    `https://www.youtube.com/watch?v=Y1Lah0BM0KQ` entry in the current yt-dlp
-    environment.
-  - `git diff --check` passed.
-- Blockers: None.
+- Active task: Published release `v1.2.8` from commit
+  `a363ee887ef24c3e60323b272b34d267ab618b99`.
+- Next action: Monitor GitHub Actions run #57 and investigate only if the
+  release workflow fails.
+- Release commit: `release(v1.2.8): publish desktop artifacts`.
+- Release tag: `release-v1.2.8`, pushed to `origin`.
+- Release verification:
+  - `tool/publish_release.ps1 -Version 1.2.8` passed its formatter, analyzer,
+    and 10 widget tests before creating the release commit.
+  - The release commit and tag were pushed successfully to `origin/main` and
+    `origin/release-v1.2.8`.
+  - GitHub Actions run #57 was queued for the tag push:
+    `https://github.com/kimmandoo/spull/actions/runs/34749110219`.
+- Included product fixes: malformed native yt-dlp output is decoded with
+  `Utf8Decoder(allowMalformed: true)`, and the advanced-settings ripple is
+  clipped to its rounded card.
+- Blockers: The remote release workflow is queued; no local blockers.
