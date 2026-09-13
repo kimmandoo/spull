@@ -919,6 +919,7 @@ class _SpullDashboardState extends State<_SpullDashboard> {
       child: Material(
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(20),
+        clipBehavior: Clip.antiAlias,
         child: Theme(
           data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
           child: ExpansionTile(

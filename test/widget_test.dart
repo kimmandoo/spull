@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -20,6 +21,19 @@ void main() {
     expect(find.text('링크 분석'), findsOneWidget);
     expect(find.text('저장 위치'), findsOneWidget);
 
+    controller.dispose();
+  });
+  testWidgets('expands advanced settings inside its rounded card', (
+    tester,
+  ) async {
+    final controller = SpullController();
+    await tester.pumpWidget(SpullApp(controller: controller));
+
+    await tester.ensureVisible(find.text('고급 설정'));
+    await tester.tap(find.byType(ExpansionTile));
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(find.text('yt-dlp 채널'), findsOneWidget);
     controller.dispose();
   });
 
@@ -44,6 +58,32 @@ void main() {
 
     expect(settings.audioQuality, '320K');
     expect(settings.videoQuality, 'best');
+  });
+  test('decodes malformed native output without throwing', () {
+    final payload = jsonDecode(
+      processOutputDecoder.convert(<int>[
+        0x7b,
+        0x22,
+        0x74,
+        0x69,
+        0x74,
+        0x6c,
+        0x65,
+        0x22,
+        0x3a,
+        0x22,
+        0x53,
+        0x70,
+        0x75,
+        0x6c,
+        0x6c,
+        0xff,
+        0x22,
+        0x7d,
+      ]),
+    ) as Map<String, dynamic>;
+
+    expect(payload['title'], 'Spull\uFFFD');
   });
   test('restores playable URLs from flat playlist entries', () {
     final playlist = PlaylistInfo.fromJson({

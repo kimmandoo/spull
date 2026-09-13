@@ -1,32 +1,22 @@
 # Work checkpoint
 
-- Active task: Fixed playlist links and rebuilt the desktop dashboard around the supplied rounded pixel-cat logo.
+- Active task: Fixed malformed UTF-8 failures while analyzing native yt-dlp output and corrected the advanced-settings ripple clipping.
 - Next action: No follow-up action; wait for the next requested task.
-- Changed files: `lib/services/spull_backend.dart`, `lib/models/media_models.dart`,
-  `lib/state/app_controller.dart`, `lib/home_page.dart`,
-  `lib/widgets/pixel_widgets.dart`, `test/widget_test.dart`,
-  `assets/spull_logo.svg`, `assets/spull_logo_1024.png`, Windows and macOS app
-  icon assets, `README.md`, `CHANGELOG.md`, and this checkpoint.
-- Playlist behavior: Analysis now explicitly accepts playlist URLs, ignores
-  unavailable playlist members while retaining usable entries, rebuilds flat
-  YouTube IDs into playable watch URLs, and reports a clear error when no
-  playable entries remain.
-- UI behavior: Dashboard uses a responsive three-step flow for adding links,
-  selecting playlist entries, and downloading. Settings, destination, support
-  catalog, progress, cancellation, and error states remain available.
-- Branding: Replaced the previous mark with a transparent rounded pixel-cat
-  logo based on the supplied reference. The UI uses its espresso, tangerine,
-  cream, burnt-orange, and pink palette. Windows and macOS icon bundles use
-  transparent RGBA exports.
+- Changed files: `lib/services/spull_backend.dart`, `lib/home_page.dart`,
+  `test/widget_test.dart`, `CHANGELOG.md`, and this checkpoint.
+- UTF-8 behavior: Native yt-dlp stdout and stderr now use one shared
+  `Utf8Decoder(allowMalformed: true)` for analysis and download streams, so an
+  isolated non-UTF-8 byte is replaced instead of throwing `FormatException`.
+  The replacement remains valid JSON and preserves the playlist response.
+- UI behavior: The advanced-settings `ExpansionTile` is wrapped in a rounded,
+  clipped `Material`, keeping its ink ripple inside the card boundary.
 - Verification:
-  - `dart run tool/verify.dart` passed formatting, analysis, and all 8 widget
-    tests after the final palette and logo changes.
+  - `dart run tool/verify.dart` passed formatting, analysis, and all 10 widget
+    tests, including malformed-output decoding and advanced-settings expansion.
   - `flutter build windows --release` passed and produced the Windows bundle.
-  - `flutter run -d windows` reached the Flutter command prompt with no runtime
-    exception and exited cleanly after the UI smoke run.
-  - Logo SVG, PNG, and ICO assets were inspected; PNG assets are RGBA and the
-    icon file contains five PNG-backed sizes.
+  - The reported URL was exercised through `SpullBackend.analyzeUrl`; it
+    completed without an invalid UTF-8 exception and returned one playable
+    `https://www.youtube.com/watch?v=Y1Lah0BM0KQ` entry in the current yt-dlp
+    environment.
   - `git diff --check` passed.
-- Blockers: Windows Flutter screenshot capture is unsupported by the installed
-  Flutter tool, so visual verification used the generated logo preview plus a
-  successful desktop runtime launch.
+- Blockers: None.

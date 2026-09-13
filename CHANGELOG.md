@@ -3,6 +3,9 @@
 ## 2026-09-13
 - fix(analysis): restored playable URLs from flat playlist responses and
   showed a clear empty-playlist error instead of leaving a dead queue.
+- fix(analysis): tolerated malformed yt-dlp output bytes so playlist metadata
+  no longer failed with an invalid UTF-8 exception.
+- fix(ui): clipped the advanced-settings ripple to its rounded card boundary.
 - refactor(ui): rebuilt the desktop dashboard around a minimal responsive
   three-step flow for adding links, selecting items, and downloading.
 - refactor(branding): replaced the mascot mark with a rounded transparent

@@ -7,6 +7,9 @@ import 'package:path/path.dart' as p;
 
 import '../models/media_models.dart';
 
+/// Decodes native yt-dlp output without letting one malformed byte abort a job.
+const processOutputDecoder = Utf8Decoder(allowMalformed: true);
+
 /// Native desktop backend implemented in Dart.
 ///
 /// It keeps the UI platform-neutral while delegating media work to the
@@ -643,8 +646,12 @@ class SpullBackend {
         runInShell: true,
       );
       task.process = process;
-      final stdoutFuture = process.stdout.transform(utf8.decoder).join();
-      final stderrFuture = process.stderr.transform(utf8.decoder).join();
+      final stdoutFuture = process.stdout
+          .transform(processOutputDecoder)
+          .join();
+      final stderrFuture = process.stderr
+          .transform(processOutputDecoder)
+          .join();
       if (task.cancelRequested) await _terminateProcess(process);
 
       int exitCode;
@@ -1103,11 +1110,11 @@ class SpullBackend {
     StreamSubscription<String>? stderrSubscription;
     try {
       stdoutSubscription = process.stdout
-          .transform(utf8.decoder)
+          .transform(processOutputDecoder)
           .transform(const LineSplitter())
           .listen(emitProcessLine);
       stderrSubscription = process.stderr
-          .transform(utf8.decoder)
+          .transform(processOutputDecoder)
           .transform(const LineSplitter())
           .listen((line) {
             if (line.trim().isNotEmpty) {
