@@ -238,6 +238,14 @@ class SpullController extends ChangeNotifier {
         );
       }
     }
+    if (entries.isEmpty) {
+      phase = AppPhase.idle;
+      errorMessage = failures.join('\n').isEmpty
+          ? '다운로드 가능한 항목을 찾지 못했습니다. 링크를 확인해 주세요.'
+          : failures.join('\n');
+      notifyListeners();
+      return;
+    }
     playlist = PlaylistInfo(
       title: results.length == 1
           ? results.first.title

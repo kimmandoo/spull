@@ -48,6 +48,44 @@ class UrlRow {
   String value;
 }
 
+String? _firstNonEmptyString(Map<String, dynamic> json, List<String> keys) {
+  for (final key in keys) {
+    final value = json[key]?.toString().trim();
+    if (value != null && value.isNotEmpty) return value;
+  }
+  return null;
+}
+
+String _entryUrl(Map<String, dynamic> json, {String? fallbackUrl}) {
+  final webpageUrl = _firstNonEmptyString(json, <String>[
+    'webpage_url',
+    'original_url',
+  ]);
+  if (webpageUrl != null) return webpageUrl;
+
+  final url = _firstNonEmptyString(json, <String>['url']);
+  if (url == null) return fallbackUrl ?? '';
+  final parsed = Uri.tryParse(url);
+  if (parsed?.hasScheme == true) return url;
+
+  final extractor =
+      (_firstNonEmptyString(json, <String>[
+                'ie_key',
+                'extractor_key',
+                'extractor',
+              ]) ??
+              '')
+          .toLowerCase();
+  final id = _firstNonEmptyString(json, <String>['id']) ?? url;
+  if (extractor.contains('youtube') &&
+      !id.contains('/') &&
+      !id.contains('?') &&
+      id.isNotEmpty) {
+    return 'https://www.youtube.com/watch?v=$id';
+  }
+  return url;
+}
+
 class VideoEntry {
   VideoEntry({
     required this.id,
@@ -89,7 +127,7 @@ class VideoEntry {
       title: (json['title'] as String?)?.trim().isNotEmpty == true
           ? json['title'] as String
           : '제목 없음',
-      url: (json['webpage_url'] ?? json['url'] ?? fallbackUrl ?? '').toString(),
+      url: _entryUrl(json, fallbackUrl: fallbackUrl),
       source: (json['source'] ?? json['extractor_key'] ?? json['extractor'])
           ?.toString(),
       thumbnail: json['thumbnail']?.toString(),
@@ -118,14 +156,15 @@ class PlaylistInfo {
     final isPlaylist = json['_type'] == 'playlist' || json['entries'] is List;
     final rawEntries = (json['entries'] as List<dynamic>?) ?? <dynamic>[json];
     final entries = <VideoEntry>[];
+    final fallbackUrl = isPlaylist ? null : sourceUrl;
     for (final raw in rawEntries) {
       if (raw is Map<String, dynamic>) {
-        final entry = VideoEntry.fromJson(raw, fallbackUrl: sourceUrl);
+        final entry = VideoEntry.fromJson(raw, fallbackUrl: fallbackUrl);
         if (entry.url.isNotEmpty) entries.add(entry);
       } else if (raw is Map) {
         final entry = VideoEntry.fromJson(
           Map<String, dynamic>.from(raw),
-          fallbackUrl: sourceUrl,
+          fallbackUrl: fallbackUrl,
         );
         if (entry.url.isNotEmpty) entries.add(entry);
       }

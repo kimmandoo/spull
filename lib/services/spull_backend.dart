@@ -558,6 +558,8 @@ class SpullBackend {
     try {
       final args = <String>[
         '--flat-playlist',
+        '--yes-playlist',
+        '--ignore-errors',
         '-J',
         '--no-warnings',
         '--socket-timeout',
@@ -572,7 +574,7 @@ class SpullBackend {
         timeout: _analysisTimeout,
         operation: '링크 분석',
       );
-      if (result.exitCode != 0) {
+      if (result.exitCode != 0 && result.stdout.trim().isEmpty) {
         throw _formatAnalysisError(result.stderr);
       }
       try {
@@ -580,7 +582,11 @@ class SpullBackend {
         if (payload is! Map<String, dynamic>) {
           throw const FormatException('response is not an object');
         }
-        return PlaylistInfo.fromJson(payload, sourceUrl: url);
+        final info = PlaylistInfo.fromJson(payload, sourceUrl: url);
+        if (info.entries.isEmpty) {
+          throw '다운로드 가능한 항목을 찾지 못했습니다.';
+        }
+        return info;
       } on FormatException catch (error) {
         throw '영상 정보 JSON을 읽지 못했습니다: $error';
       }

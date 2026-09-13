@@ -1,29 +1,30 @@
 import 'package:flutter/material.dart';
 
 class PixelColors {
-  static const ink = Color(0xFF17162A);
-  static const background = Color(0xFFECE3D8);
-  static const panel = Color(0xFFE2D7CC);
-  static const panelLight = Color(0xFFF4ECE2);
-  static const outline = Color(0xFFB47A6E);
-  static const cream = Color(0xFFFFF4D1);
-  static const text = Color(0xFF2A2037);
-  static const muted = Color(0xFF766B78);
-  static const orange = Color(0xFFE28A66);
-  static const yellow = Color(0xFFD4AD55);
-  static const mint = Color(0xFF4F7565);
-  static const pink = Color(0xFFD86D82);
-  static const sky = Color(0xFFCE9A82);
-  static const logoOrange = Color(0xFFFF9F68);
-  static const logoMint = Color(0xFF8DAA9D);
-  static const logoPink = Color(0xFFFF7891);
+  // Warm pixel-cat palette: espresso outline, tangerine fur, cream, and pink.
+  static const ink = Color(0xFF4B2418);
+  static const background = Color(0xFFFFE9C7);
+  static const panel = Color(0xFFFFFBF3);
+  static const panelLight = Color(0xFFFFF3DD);
+  static const outline = Color(0xFFE7B98F);
+  static const cream = Color(0xFFFFF0D0);
+  static const text = Color(0xFF4B2418);
+  static const muted = Color(0xFF8A6652);
+  static const orange = Color(0xFFFF9D3A);
+  static const yellow = Color(0xFFFF9A83);
+  static const mint = Color(0xFFD86420);
+  static const pink = Color(0xFFF07B77);
+  static const sky = Color(0xFFFFC875);
+  static const logoOrange = Color(0xFFFF9D3A);
+  static const logoMint = Color(0xFFFFF0D0);
+  static const logoPink = Color(0xFFF07B77);
 }
 
 class PixelPanel extends StatelessWidget {
   const PixelPanel({
     super.key,
     required this.child,
-    this.padding = const EdgeInsets.all(18),
+    this.padding = const EdgeInsets.all(20),
     this.color = PixelColors.panel,
   });
 
@@ -36,12 +37,13 @@ class PixelPanel extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: color,
-        border: Border.all(color: PixelColors.outline, width: 1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: PixelColors.outline),
         boxShadow: const <BoxShadow>[
           BoxShadow(
-            color: PixelColors.outline,
-            offset: Offset(2, 2),
-            blurRadius: 0,
+            color: Color(0x0A172033),
+            offset: Offset(0, 5),
+            blurRadius: 18,
           ),
         ],
       ),
@@ -72,9 +74,9 @@ class PixelButton extends StatelessWidget {
     final baseBackground = switch (tone) {
       PixelButtonTone.primary => PixelColors.orange,
       PixelButtonTone.danger => PixelColors.pink,
-      PixelButtonTone.ghost => PixelColors.panelLight,
+      PixelButtonTone.ghost => PixelColors.panel,
     };
-    final background = enabled ? baseBackground : const Color(0xFFE9D8D0);
+    final background = enabled ? baseBackground : PixelColors.panelLight;
     final foreground = enabled
         ? (tone == PixelButtonTone.ghost ? PixelColors.text : PixelColors.ink)
         : PixelColors.muted;
@@ -82,24 +84,27 @@ class PixelButton extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onPressed,
+        borderRadius: BorderRadius.circular(12),
         child: Ink(
-          color: background,
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+          decoration: BoxDecoration(
+            color: background,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
           child: Row(
             mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               if (icon != null) ...<Widget>[
-                Icon(icon, size: 16, color: foreground),
-                const SizedBox(width: 7),
+                Icon(icon, size: 17, color: foreground),
+                const SizedBox(width: 8),
               ],
               Text(
                 label,
                 style: TextStyle(
                   color: foreground,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 12,
-                  letterSpacing: 0.5,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
                 ),
               ),
             ],
@@ -113,23 +118,16 @@ class PixelButton extends StatelessWidget {
       label: label,
       child: Container(
         decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: enabled && tone != PixelButtonTone.ghost
                 ? baseBackground
                 : PixelColors.outline,
-            width: 1,
           ),
-          boxShadow: enabled
-              ? const <BoxShadow>[
-                  BoxShadow(
-                    color: PixelColors.outline,
-                    offset: Offset(1, 1),
-                    blurRadius: 0,
-                  ),
-                ]
-              : null,
         ),
-        child: button,
+        child: expand
+            ? SizedBox(width: double.infinity, child: button)
+            : button,
       ),
     );
   }
@@ -150,18 +148,18 @@ class PixelTag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.16),
-        border: Border.all(color: color, width: 1),
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(99),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Text(
         label,
         style: TextStyle(
           color: color,
-          fontSize: 10,
-          fontWeight: FontWeight.w900,
-          letterSpacing: 0.8,
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );
@@ -178,182 +176,178 @@ class PixelLogo extends StatelessWidget {
     return SizedBox(
       width: size,
       height: size,
-      child: CustomPaint(painter: _PixelLogoPainter()),
+      child: CustomPaint(painter: _SpullLogoPainter()),
     );
   }
 }
 
+class _SpullLogoPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final scale = size.width / 32;
+    canvas
+      ..save()
+      ..scale(scale);
+    final outline = Paint()
+      ..color = PixelColors.text
+      ..isAntiAlias = false;
+    final fur = Paint()
+      ..color = PixelColors.orange
+      ..isAntiAlias = false;
+    final darkFur = Paint()
+      ..color = PixelColors.yellow
+      ..isAntiAlias = false;
+    final cream = Paint()
+      ..color = PixelColors.cream
+      ..isAntiAlias = false;
+    final pink = Paint()
+      ..color = PixelColors.pink
+      ..isAntiAlias = false;
+
+    void rect(Paint paint, double x, double y, double width, double height) {
+      canvas.drawRect(Rect.fromLTWH(x, y, width, height), paint);
+    }
+
+    final head = Path()
+      ..moveTo(4, 9)
+      ..lineTo(4, 5)
+      ..lineTo(6, 5)
+      ..lineTo(6, 3)
+      ..lineTo(10, 3)
+      ..lineTo(10, 5)
+      ..lineTo(12, 5)
+      ..lineTo(12, 7)
+      ..lineTo(20, 7)
+      ..lineTo(20, 5)
+      ..lineTo(22, 5)
+      ..lineTo(22, 3)
+      ..lineTo(26, 3)
+      ..lineTo(26, 5)
+      ..lineTo(28, 5)
+      ..lineTo(28, 9)
+      ..lineTo(30, 9)
+      ..lineTo(30, 11)
+      ..lineTo(31, 11)
+      ..lineTo(31, 24)
+      ..lineTo(29, 24)
+      ..lineTo(29, 27)
+      ..lineTo(26, 27)
+      ..lineTo(26, 29)
+      ..lineTo(23, 29)
+      ..lineTo(23, 30)
+      ..lineTo(9, 30)
+      ..lineTo(9, 29)
+      ..lineTo(6, 29)
+      ..lineTo(6, 27)
+      ..lineTo(4, 27)
+      ..lineTo(4, 24)
+      ..lineTo(2, 24)
+      ..lineTo(2, 11)
+      ..lineTo(4, 11)
+      ..close();
+    canvas.drawPath(head, outline);
+
+    final face = Path()
+      ..moveTo(5, 11)
+      ..lineTo(8, 11)
+      ..lineTo(8, 8)
+      ..lineTo(11, 8)
+      ..lineTo(11, 10)
+      ..lineTo(21, 10)
+      ..lineTo(21, 8)
+      ..lineTo(24, 8)
+      ..lineTo(24, 11)
+      ..lineTo(27, 11)
+      ..lineTo(27, 14)
+      ..lineTo(29, 14)
+      ..lineTo(29, 23)
+      ..lineTo(27, 23)
+      ..lineTo(27, 26)
+      ..lineTo(7, 26)
+      ..lineTo(7, 23)
+      ..lineTo(4, 23)
+      ..lineTo(4, 14)
+      ..lineTo(5, 14)
+      ..close();
+    canvas.drawPath(face, fur);
+
+    rect(cream, 6, 7, 2, 4);
+    rect(cream, 8, 8, 2, 3);
+    rect(cream, 24, 7, 2, 4);
+    rect(cream, 22, 8, 2, 3);
+    rect(pink, 7, 9, 1, 2);
+    rect(pink, 24, 9, 1, 2);
+    rect(darkFur, 14, 10, 4, 2);
+    rect(darkFur, 15, 12, 2, 2);
+    rect(darkFur, 4, 15, 4, 2);
+    rect(darkFur, 24, 15, 5, 2);
+    rect(darkFur, 4, 20, 3, 2);
+    rect(darkFur, 25, 20, 4, 2);
+    rect(darkFur, 7, 24, 3, 2);
+    rect(darkFur, 22, 24, 3, 2);
+
+    rect(outline, 8, 14, 4, 5);
+    rect(outline, 20, 14, 4, 5);
+    rect(cream, 9, 14, 1, 1);
+    rect(cream, 21, 14, 1, 1);
+    rect(cream, 8, 19, 4, 1);
+    rect(cream, 20, 19, 4, 1);
+    rect(cream, 10, 18, 12, 2);
+    rect(cream, 8, 20, 16, 6);
+    rect(cream, 10, 26, 12, 2);
+
+    rect(pink, 15, 17, 2, 2);
+    final openMouth = Path()
+      ..moveTo(12, 20)
+      ..lineTo(20, 20)
+      ..lineTo(20, 21)
+      ..lineTo(22, 21)
+      ..lineTo(22, 26)
+      ..lineTo(20, 26)
+      ..lineTo(20, 28)
+      ..lineTo(12, 28)
+      ..lineTo(12, 26)
+      ..lineTo(10, 26)
+      ..lineTo(10, 21)
+      ..lineTo(12, 21)
+      ..close();
+    canvas.drawPath(openMouth, outline);
+    rect(cream, 12, 20, 3, 2);
+    rect(cream, 17, 20, 3, 2);
+    rect(pink, 13, 24, 6, 4);
+    rect(pink, 15, 23, 2, 1);
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
 class PixelProgressBar extends StatelessWidget {
-  const PixelProgressBar({super.key, required this.value, this.height = 14});
+  const PixelProgressBar({super.key, required this.value, this.height = 10});
 
   final double? value;
   final double height;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: height,
-      decoration: BoxDecoration(
-        color: PixelColors.panelLight,
-        border: Border.all(color: PixelColors.outline, width: 2),
-      ),
-      padding: const EdgeInsets.all(3),
-      child: value == null
-          ? const LinearProgressIndicator(
-              minHeight: 4,
-              backgroundColor: PixelColors.panel,
-              valueColor: AlwaysStoppedAnimation<Color>(PixelColors.mint),
-            )
-          : Container(
-              color: PixelColors.panel,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: FractionallySizedBox(
-                  widthFactor: value!.clamp(0, 1),
-                  child: Container(
-                    decoration: const BoxDecoration(color: PixelColors.mint),
-                    child: Row(
-                      children: List<Widget>.generate(
-                        12,
-                        (_) => const Expanded(child: SizedBox()),
-                      ),
-                    ),
-                  ),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(height),
+      child: SizedBox(
+        height: height,
+        child: value == null
+            ? const LinearProgressIndicator(
+                backgroundColor: PixelColors.outline,
+                valueColor: AlwaysStoppedAnimation<Color>(PixelColors.mint),
+              )
+            : LinearProgressIndicator(
+                value: value!.clamp(0, 1),
+                backgroundColor: PixelColors.outline,
+                valueColor: const AlwaysStoppedAnimation<Color>(
+                  PixelColors.mint,
                 ),
               ),
-            ),
+      ),
     );
   }
-}
-
-class PixelScene extends StatelessWidget {
-  const PixelScene({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _PixelScenePainter(),
-      child: const SizedBox.expand(),
-    );
-  }
-}
-
-class _PixelLogoPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final scale = size.shortestSide / 16;
-    final fill = Paint()..style = PaintingStyle.fill;
-    void block(int x, int y, int width, int height, Color color) {
-      fill.color = color;
-      canvas.drawRect(
-        Rect.fromLTWH(x * scale, y * scale, width * scale, height * scale),
-        fill,
-      );
-    }
-
-    // Transparent pixel logo mark.
-    block(3, 0, 3, 1, PixelColors.ink);
-    block(10, 0, 3, 1, PixelColors.ink);
-    block(2, 1, 5, 4, PixelColors.ink);
-    block(9, 1, 5, 4, PixelColors.ink);
-    block(1, 4, 14, 9, PixelColors.ink);
-    block(3, 13, 10, 2, PixelColors.ink);
-    block(3, 2, 3, 3, PixelColors.logoOrange);
-    block(10, 2, 3, 3, PixelColors.logoOrange);
-    block(2, 5, 12, 7, PixelColors.logoOrange);
-    block(4, 7, 2, 2, PixelColors.ink);
-    block(10, 7, 2, 2, PixelColors.ink);
-    block(5, 7, 1, 1, PixelColors.cream);
-    block(10, 7, 1, 1, PixelColors.cream);
-    block(2, 9, 2, 1, PixelColors.cream);
-    block(12, 9, 2, 1, PixelColors.cream);
-    block(5, 9, 6, 3, PixelColors.cream);
-    block(7, 10, 2, 1, PixelColors.logoPink);
-    block(6, 11, 1, 1, PixelColors.ink);
-    block(9, 11, 1, 1, PixelColors.ink);
-    block(5, 13, 6, 1, PixelColors.logoMint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class _PixelScenePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..style = PaintingStyle.fill;
-    paint.color = PixelColors.panel;
-    canvas.drawRect(Offset.zero & size, paint);
-
-    final unit = (size.height / 24).clamp(3.0, 8.0).toDouble();
-    void block(num x, num y, num width, num height, Color color) {
-      paint.color = color;
-      canvas.drawRect(
-        Rect.fromLTWH(
-          x.toDouble() * unit,
-          y.toDouble() * unit,
-          width.toDouble() * unit,
-          height.toDouble() * unit,
-        ),
-        paint,
-      );
-    }
-
-    // A tiny night-sky map keeps the hero readable while adding game texture.
-    block(3, 3, 1, 1, PixelColors.yellow);
-    block(8, 2, 2, 1, PixelColors.cream);
-    block(17, 4, 1, 1, PixelColors.mint);
-    block(24, 2, 1, 1, PixelColors.yellow);
-    block(29, 5, 2, 1, PixelColors.cream);
-    block(5, 8, 1, 1, PixelColors.sky);
-    block(21, 7, 1, 1, PixelColors.sky);
-    block(32, 9, 1, 1, PixelColors.mint);
-
-    // Pixel moon and a small floating planet.
-    block(2, 11, 4, 1, PixelColors.yellow);
-    block(1, 12, 6, 2, PixelColors.yellow);
-    block(2, 14, 4, 1, PixelColors.yellow);
-    block(27, 11, 3, 1, PixelColors.sky);
-    block(26, 12, 5, 2, PixelColors.sky);
-    block(27, 14, 3, 1, PixelColors.sky);
-
-    final ox = (size.width / unit).floor() - 16;
-    const oy = 3.0;
-    final dark = PixelColors.ink;
-
-    // Accent blocks keep the small scene readable.
-    block(ox + 7, oy - 2, 2, 2, dark);
-    block(ox + 6, oy - 3, 4, 1, PixelColors.mint);
-    block(ox + 2, oy, 4, 1, dark);
-    block(ox + 10, oy, 4, 1, dark);
-    block(ox + 1, oy + 1, 6, 4, dark);
-    block(ox + 9, oy + 1, 6, 4, dark);
-    block(ox + 3, oy + 2, 3, 3, PixelColors.orange);
-    block(ox + 10, oy + 2, 3, 3, PixelColors.orange);
-    block(ox, oy + 5, 16, 9, dark);
-    block(ox + 2, oy + 6, 12, 7, PixelColors.orange);
-    block(ox + 4, oy + 8, 8, 4, PixelColors.cream);
-    block(ox + 4, oy + 8, 2, 2, dark);
-    block(ox + 10, oy + 8, 2, 2, dark);
-    block(ox + 5, oy + 8, 1, 1, PixelColors.cream);
-    block(ox + 10, oy + 8, 1, 1, PixelColors.cream);
-    block(ox + 7, oy + 10, 2, 1, PixelColors.pink);
-    block(ox + 6, oy + 11, 1, 1, dark);
-    block(ox + 9, oy + 11, 1, 1, dark);
-    block(ox + 5, oy + 13, 6, 1, PixelColors.mint);
-    block(ox + 2, oy + 14, 12, 1, dark);
-    block(ox + 3, oy + 15, 10, 2, PixelColors.sky);
-    block(ox + 1, oy + 17, 14, 1, PixelColors.mint);
-    block(ox - 3, oy + 18, 4, 1, PixelColors.orange);
-    block(ox + 15, oy + 18, 4, 1, PixelColors.orange);
-
-    // Low horizon and simple pixel rails.
-    block(0, 21, 40, 1, PixelColors.panelLight);
-    block(2, 22, 7, 1, PixelColors.outline);
-    block(13, 22, 9, 1, PixelColors.outline);
-    block(26, 22, 6, 1, PixelColors.outline);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

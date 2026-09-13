@@ -1,7 +1,7 @@
 # Spull
 
 <p align="center">
-  <img src="assets/spull_logo.svg" alt="Spull pixel logo" width="144" />
+  <img src="assets/spull_logo.svg" alt="Spull rounded pixel cat logo" width="144" />
 </p>
 
 <p align="center">
@@ -33,7 +33,7 @@ Spull turns one or more links into a selectable download queue. It keeps the int
 
 ## Screenshots in one sentence
 
-Light logo-derived colors, compact pixel accents, no decorative clutter: the queue and its current state remain the visual priority.
+Warm cream surfaces, espresso outlines, tangerine actions, and pink accents carry the rounded pixel-cat palette through the three-step workflow.
 
 ## Quick start
 

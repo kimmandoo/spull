@@ -14,10 +14,11 @@ void main() {
     final controller = SpullController();
     await tester.pumpWidget(SpullApp(controller: controller));
 
-    expect(find.text('MEDIA DOWNLOADER'), findsOneWidget);
-    expect(find.text('LINKS'), findsOneWidget);
-    expect(find.text('SCAN LINKS'), findsOneWidget);
-    expect(find.text('DOWNLOAD FOLDER'), findsOneWidget);
+    expect(find.text('Spull'), findsOneWidget);
+    expect(find.text('STEP 1'), findsOneWidget);
+    expect(find.text('다른 링크 추가'), findsOneWidget);
+    expect(find.text('링크 분석'), findsOneWidget);
+    expect(find.text('저장 위치'), findsOneWidget);
 
     controller.dispose();
   });
@@ -43,6 +44,50 @@ void main() {
 
     expect(settings.audioQuality, '320K');
     expect(settings.videoQuality, 'best');
+  });
+  test('restores playable URLs from flat playlist entries', () {
+    final playlist = PlaylistInfo.fromJson({
+      '_type': 'playlist',
+      'title': 'My mix',
+      'entries': [
+        {
+          '_type': 'url',
+          'id': 'video-one',
+          'url': 'video-one',
+          'ie_key': 'Youtube',
+          'title': 'First video',
+        },
+        {
+          '_type': 'url',
+          'id': 'video-two',
+          'url': 'video-two',
+          'original_url': 'https://www.youtube.com/watch?v=video-two',
+          'title': 'Second video',
+        },
+      ],
+    }, sourceUrl: 'https://www.youtube.com/playlist?list=example');
+
+    expect(playlist.entries, hasLength(2));
+    expect(
+      playlist.entries.first.url,
+      'https://www.youtube.com/watch?v=video-one',
+    );
+    expect(
+      playlist.entries.last.url,
+      'https://www.youtube.com/watch?v=video-two',
+    );
+  });
+
+  test('returns to idle when analysis has no playable entries', () async {
+    final controller = SpullController(backend: _EmptyBackend());
+    controller.urlRows.first.value =
+        'https://www.youtube.com/playlist?list=empty';
+
+    await controller.analyze();
+
+    expect(controller.phase, AppPhase.idle);
+    expect(controller.errorMessage, '다운로드 가능한 항목을 찾지 못했습니다. 링크를 확인해 주세요.');
+    controller.dispose();
   });
 
   test('cancelling analysis returns the controller to idle', () async {
@@ -85,6 +130,20 @@ void main() {
 
     expect(find.byType(LinearProgressIndicator), findsOneWidget);
   });
+}
+
+class _EmptyBackend extends SpullBackend {
+  @override
+  Future<PlaylistInfo> analyzeUrl({
+    required String url,
+    required AppSettings settings,
+  }) async {
+    return PlaylistInfo(
+      title: 'Empty',
+      entries: <VideoEntry>[],
+      isPlaylist: true,
+    );
+  }
 }
 
 class _BlockingBackend extends SpullBackend {

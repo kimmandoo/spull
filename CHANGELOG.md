@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-13
+- fix(analysis): restored playable URLs from flat playlist responses and
+  showed a clear empty-playlist error instead of leaving a dead queue.
+- refactor(ui): rebuilt the desktop dashboard around a minimal responsive
+  three-step flow for adding links, selecting items, and downloading.
+- refactor(branding): replaced the mascot mark with a rounded transparent
+  pixel-cat logo and matched the dashboard palette to its warm fur, cream,
+  espresso, and pink tones.
+
 ## 2026-09-12
 - ci(release): built a universal unsigned macOS bundle on an Apple Silicon
   runner and published a quarantine-clearing launcher for Intel and Apple
